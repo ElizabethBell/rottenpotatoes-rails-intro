@@ -11,7 +11,20 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @sort = nil
+    
+    if ["title", "release_date"].member?(params.fetch("sort", nil))
+      @sort = params[:sort]
+    end
+    
+    #sess_sort = session.fetch("movies_sort", nil)
+    
     @movies = Movie.all
+    if @sort != nil
+      @movies = @movies.order(@sort)
+    end
+    
+    session[:movies_sort] = @sort
   end
 
   def new
