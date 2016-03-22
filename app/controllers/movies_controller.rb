@@ -11,20 +11,25 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @all_ratings = Movie.all_ratings
     @sort = nil
+    @ratings = @all_ratings
+    
+    if params.fetch("ratings", false)
+      @ratings = params[:ratings].keys
+    end
     
     if ["title", "release_date"].member?(params.fetch("sort", nil))
       @sort = params[:sort]
     end
-    
-    #sess_sort = session.fetch("movies_sort", nil)
-    
-    @movies = Movie.all
+    #
+    @movies = Movie.where(:rating => @ratings)
     if @sort != nil
       @movies = @movies.order(@sort)
     end
     
     session[:movies_sort] = @sort
+    session[:movies_ratings] = @ratings
   end
 
   def new
