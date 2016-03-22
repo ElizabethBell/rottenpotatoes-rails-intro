@@ -22,7 +22,16 @@ class MoviesController < ApplicationController
     if ["title", "release_date"].member?(params.fetch("sort", nil))
       @sort = params[:sort]
     end
-    #
+    
+    sess_sort = session.fetch("movies_sort", nil)
+    sess_ratings = session.fetch("movies_ratings", @all_ratings)
+    
+    if (@ratings == @all_ratings and @sort == nil and (sess_ratings != @all_ratings or sess_sort != nil))
+      flash.keep
+      ratings_params = Hash[*sess_ratings.collect{|k| [k, "1"]}.flatten]
+      return redirect_to movies_path(nil, {:sort => sess_sort, :ratings => ratings_params})
+    end
+    
     @movies = Movie.where(:rating => @ratings)
     if @sort != nil
       @movies = @movies.order(@sort)
